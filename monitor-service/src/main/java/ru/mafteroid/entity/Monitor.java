@@ -55,6 +55,29 @@ public class Monitor {
 
     protected Monitor() {}
 
+    public static Monitor create(
+            String name,
+            String url,
+            int intervalSeconds,
+            int timeoutMs
+    ) {
+        Monitor monitor = new Monitor();
+
+        Instant now = Instant.now();
+
+        monitor.name = name;
+        monitor.url = url;
+        monitor.intervalSeconds = intervalSeconds;
+        monitor.timeoutMs = timeoutMs;
+
+        monitor.enabled = true;
+        monitor.nextCheckAt = now;
+        monitor.createdAt = now;
+        monitor.updatedAt = now;
+
+        return monitor;
+    }
+
     public UUID getId() {
         return id;
     }
