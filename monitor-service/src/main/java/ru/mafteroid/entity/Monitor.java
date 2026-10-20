@@ -37,7 +37,7 @@ public class Monitor {
     @NotNull
     @ColumnDefault("true")
     @Column(name = "enabled", nullable = false)
-    private Boolean enabled = false;
+    private Boolean enabled = true;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "next_check_at")

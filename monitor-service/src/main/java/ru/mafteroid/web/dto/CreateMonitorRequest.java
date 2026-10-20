@@ -8,6 +8,7 @@ public record CreateMonitorRequest(
         String name,
 
         @NotBlank
+        @Size(max = 2048)
         String url,
 
         @NotNull
