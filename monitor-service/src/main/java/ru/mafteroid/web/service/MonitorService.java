@@ -2,6 +2,8 @@ package ru.mafteroid.web.service;
 
 import org.springframework.stereotype.Service;
 import ru.mafteroid.entity.Monitor;
+import ru.mafteroid.exception.InvalidMonitorConfigurationException;
+import ru.mafteroid.exception.MonitorNotFoundException;
 import ru.mafteroid.repository.MonitorRepository;
 import ru.mafteroid.web.dto.CreateMonitorRequest;
 import ru.mafteroid.web.dto.MonitorResponse;
@@ -32,31 +34,31 @@ public class MonitorService {
             if (scheme == null ||
                     !(scheme.equalsIgnoreCase("http")
                             || scheme.equalsIgnoreCase("https"))) {
-                throw new IllegalArgumentException("Only HTTP/HTTPS allowed");
+                throw new InvalidMonitorConfigurationException("Only HTTP/HTTPS allowed");
             }
 
             if (uri.getHost() == null) {
-                throw new IllegalArgumentException("URL must contain a host");
+                throw new InvalidMonitorConfigurationException("URL must contain a host");
             }
 
             if (uri.getUserInfo() != null) {
-                throw new IllegalArgumentException("URL credentials are not allowed");
+                throw new InvalidMonitorConfigurationException("URL credentials are not allowed");
             }
 
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Invalid URL", e);
+            throw new InvalidMonitorConfigurationException("Invalid URL", e);
         }
     }
 
     public MonitorResponse createMonitor(CreateMonitorRequest createMonitorRequest) {
 
         if (!ALLOWED_INTERVALS.contains(createMonitorRequest.intervalSeconds())){
-            throw new IllegalArgumentException("Invalid interval " + createMonitorRequest.intervalSeconds());
+            throw new InvalidMonitorConfigurationException("Invalid interval: " + createMonitorRequest.intervalSeconds());
         }
         validateUrl(createMonitorRequest.url());
 
         if (createMonitorRequest.timeoutMs() >= createMonitorRequest.intervalSeconds() * 1000) {
-            throw new IllegalArgumentException(
+            throw new InvalidMonitorConfigurationException(
                     "Timeout must be less than interval"
             );
         }
@@ -74,7 +76,7 @@ public class MonitorService {
 
     public MonitorResponse findMonitorById(UUID monitorId) {
         Monitor monitor = monitorRepository.findById(monitorId).orElseThrow(
-                () -> new IllegalArgumentException("Monitor with id " + monitorId + " not found")
+                () -> new MonitorNotFoundException(monitorId)
         );
         return new MonitorResponse(monitor);
     }
