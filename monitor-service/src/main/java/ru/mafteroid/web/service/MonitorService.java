@@ -31,7 +31,6 @@ public class MonitorService {
             URI uri = new URI(url);
 
             String scheme = uri.getScheme();
-//TODO: custom exceptions
             if (scheme == null ||
                     !(scheme.equalsIgnoreCase("http")
                             || scheme.equalsIgnoreCase("https"))) {
