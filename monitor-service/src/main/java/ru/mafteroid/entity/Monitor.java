@@ -78,6 +78,20 @@ public class Monitor {
         return monitor;
     }
 
+    public void pause() {
+        this.enabled = false;
+        this.nextCheckAt = null;
+        this.updatedAt = Instant.now();
+    }
+    public void resume() {
+        if (Boolean.TRUE.equals(this.enabled)) {
+            return;
+        }
+        this.enabled = true;
+        this.nextCheckAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
     public UUID getId() {
         return id;
     }

@@ -1,6 +1,7 @@
 package ru.mafteroid.web.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mafteroid.entity.Monitor;
 import ru.mafteroid.exception.InvalidMonitorConfigurationException;
 import ru.mafteroid.exception.MonitorNotFoundException;
@@ -84,5 +85,24 @@ public class MonitorService {
         return monitorRepository.findAll().stream()
                 .map(MonitorResponse::new)
                 .toList();
+    }
+
+    @Transactional
+    public MonitorResponse updateMonitor(UUID id, Boolean enabled) {
+        Monitor monitor = monitorRepository.findById(id).orElseThrow(
+                () -> new MonitorNotFoundException(id)
+        );
+        if (enabled) {
+            monitor.resume();
+        }else  {
+            monitor.pause();
+        }
+
+        return new MonitorResponse(monitor);
+
+    }
+
+    public void deleteMonitor(UUID id) {
+        monitorRepository.deleteById(id);
     }
 }
