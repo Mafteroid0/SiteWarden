@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mafteroid.web.dto.CreateMonitorRequest;
 import ru.mafteroid.web.dto.MonitorResponse;
 import ru.mafteroid.web.dto.UpdateMonitorStateRequest;
-import ru.mafteroid.web.service.MonitorService;
+import ru.mafteroid.service.MonitorService;
 
 import java.util.List;
 import java.util.UUID;

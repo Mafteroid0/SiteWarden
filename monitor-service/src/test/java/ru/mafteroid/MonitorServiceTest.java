@@ -11,7 +11,7 @@ import ru.mafteroid.exception.InvalidMonitorConfigurationException;
 import ru.mafteroid.repository.MonitorRepository;
 import ru.mafteroid.web.dto.CreateMonitorRequest;
 import ru.mafteroid.web.dto.MonitorResponse;
-import ru.mafteroid.web.service.MonitorService;
+import ru.mafteroid.service.MonitorService;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

@@ -1,4 +1,4 @@
-package ru.mafteroid.web.service;
+package ru.mafteroid.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,4 +104,5 @@ public class MonitorService {
     public void deleteMonitor(UUID id) {
         monitorRepository.deleteById(id);
     }
+
 }

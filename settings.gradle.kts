@@ -8,3 +8,4 @@ pluginManagement {
 
 rootProject.name = "SiteWarden"
 include("monitor-service")
+include("common-events")
