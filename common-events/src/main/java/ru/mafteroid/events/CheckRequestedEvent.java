@@ -1,6 +1,5 @@
 package ru.mafteroid.events;
 
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -9,5 +8,12 @@ public record CheckRequestedEvent(
         UUID monitorId,
         String url,
         Integer timeoutMs,
-        Instant requestedAt
-) {}
+        Instant requestedAt,
+        CheckType checkType
+) {
+    public CheckRequestedEvent {
+        if (checkType == null) {
+            checkType = CheckType.HTTP;
+        }
+    }
+}

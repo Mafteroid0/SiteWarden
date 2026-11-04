@@ -3,6 +3,7 @@ package ru.mafteroid.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mafteroid.entity.Monitor;
+import ru.mafteroid.events.CheckType;
 import ru.mafteroid.exception.InvalidMonitorConfigurationException;
 import ru.mafteroid.exception.MonitorNotFoundException;
 import ru.mafteroid.repository.MonitorRepository;
@@ -52,6 +53,19 @@ public class MonitorService {
 
     public MonitorResponse createMonitor(CreateMonitorRequest createMonitorRequest) {
 
+        if (createMonitorRequest.checkType() == null) {
+            throw new InvalidMonitorConfigurationException(
+                    "checkType is required"
+            );
+        }
+
+        if (createMonitorRequest.checkType() != CheckType.HTTP) {
+            throw new InvalidMonitorConfigurationException(
+                    "Check type is not implemented yet: "
+                            + createMonitorRequest.checkType()
+            );
+        }
+
         if (!ALLOWED_INTERVALS.contains(createMonitorRequest.intervalSeconds())){
             throw new InvalidMonitorConfigurationException("Invalid interval: " + createMonitorRequest.intervalSeconds());
         }
@@ -64,10 +78,13 @@ public class MonitorService {
         }
 
 
-        Monitor monitor = Monitor.create(createMonitorRequest.name(),
+        Monitor monitor = Monitor.create(
+                createMonitorRequest.name(),
                 createMonitorRequest.url(),
                 createMonitorRequest.intervalSeconds(),
-                createMonitorRequest.timeoutMs());
+                createMonitorRequest.timeoutMs(),
+                createMonitorRequest.checkType()
+        );
 
         Monitor savedMonitor = monitorRepository.save(monitor);
 

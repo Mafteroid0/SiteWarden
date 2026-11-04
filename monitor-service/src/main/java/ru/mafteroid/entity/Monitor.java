@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
+import ru.mafteroid.events.CheckType;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -53,22 +55,31 @@ public class Monitor {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "check_type", nullable = false, length = 32)
+    private CheckType checkType;
+
     protected Monitor() {}
 
     public static Monitor create(
             String name,
             String url,
             int intervalSeconds,
-            int timeoutMs
+            int timeoutMs,
+            CheckType checkType
     ) {
         Monitor monitor = new Monitor();
-
         Instant now = Instant.now();
 
         monitor.name = name;
         monitor.url = url;
         monitor.intervalSeconds = intervalSeconds;
         monitor.timeoutMs = timeoutMs;
+        monitor.checkType = Objects.requireNonNull(
+                checkType,
+                "checkType must not be null"
+        );
 
         monitor.enabled = true;
         monitor.nextCheckAt = now;
@@ -162,6 +173,10 @@ public class Monitor {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public CheckType getCheckType() {
+        return checkType;
     }
 
 }

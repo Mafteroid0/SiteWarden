@@ -1,6 +1,7 @@
 package ru.mafteroid.web.dto;
 
 import jakarta.validation.constraints.*;
+import ru.mafteroid.events.CheckType;
 
 public record CreateMonitorRequest(
         @NotBlank
@@ -18,5 +19,8 @@ public record CreateMonitorRequest(
         @NotNull
         @Min(1000)
         @Max(10000)
-        Integer timeoutMs
+        Integer timeoutMs,
+
+        @NotNull
+        CheckType checkType
 ) {}

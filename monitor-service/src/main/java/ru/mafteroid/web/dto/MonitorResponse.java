@@ -1,6 +1,7 @@
 package ru.mafteroid.web.dto;
 
 import ru.mafteroid.entity.Monitor;
+import ru.mafteroid.events.CheckType;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,9 +14,10 @@ public record MonitorResponse(
         Integer timeoutMs,
         boolean enabled,
         Instant nextCheckAt,
-        Instant createdAt
+        Instant createdAt,
+        CheckType checkType
 ) {
-    public MonitorResponse(Monitor monitor){
+    public MonitorResponse(Monitor monitor) {
         this(
                 monitor.getId(),
                 monitor.getName(),
@@ -24,7 +26,8 @@ public record MonitorResponse(
                 monitor.getTimeoutMs(),
                 monitor.getEnabled(),
                 monitor.getNextCheckAt(),
-                monitor.getCreatedAt()
+                monitor.getCreatedAt(),
+                monitor.getCheckType()
         );
     }
 }

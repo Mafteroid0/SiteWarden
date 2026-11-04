@@ -17,7 +17,8 @@ public final class CheckRequestedEventFactory {
                 monitor.getId(),
                 monitor.getUrl(),
                 monitor.getTimeoutMs(),
-                Instant.now()
+                Instant.now(),
+                monitor.getCheckType()
         );
     }
 }
