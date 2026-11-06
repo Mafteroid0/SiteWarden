@@ -7,6 +7,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.mafteroid.events.CheckCompletedEvent;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 @Component
 public class CheckCompletedPublisher {
     private final KafkaTemplate<String, CheckCompletedEvent> kafkaTemplate;
@@ -16,20 +19,20 @@ public class CheckCompletedPublisher {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publish(CheckCompletedEvent event) {
-        kafkaTemplate.send(
-                "check.completed",
-                event.monitorId().toString(),
-                event
-        ).whenComplete((result,exception)->{
-            if (exception != null) {
-                log.error("Publishing failed: " + event.checkId(), exception);
-            } else{
-                log.info("Published checkId={}, partition={}, offset={} ",
-                        event.checkId(),
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
-            }
-        });
-    }
-}
+    public void publish(CheckCompletedEvent event) throws InterruptedException{
+        try {
+            var result = kafkaTemplate
+                    .send("check.completed", event.monitorId().toString(), event)
+                    .get(10, TimeUnit.SECONDS);
+
+            log.info("Published checkId={}, partition={}, offset={}",
+                    event.checkId(),
+                    result.getRecordMetadata().partition(),
+                    result.getRecordMetadata().offset());
+
+        } catch (ExecutionException | java.util.concurrent.TimeoutException e) {
+            throw new IllegalStateException(
+                    "Kafka did not confirm checkId=" + event.checkId(), e
+            );
+        }
+}}
