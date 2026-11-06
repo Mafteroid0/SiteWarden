@@ -1,12 +1,11 @@
 package ru.mafteroid.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import ru.mafteroid.entity.CheckResult;
+import ru.mafteroid.entity.Incident;
 
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public interface IncidentRepository extends JpaRepository<CheckResult, UUID> {
-
+public interface IncidentRepository extends JpaRepository<Incident, UUID> {
+    Optional<Incident> findByMonitorIdAndResolvedAtIsNull(UUID id);
 }
