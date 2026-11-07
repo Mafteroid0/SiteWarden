@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mafteroid.MonitorStatusResponse;
 import ru.mafteroid.entity.CheckResult;
 import ru.mafteroid.entity.Incident;
 import ru.mafteroid.entity.MonitorStatus;
@@ -24,7 +25,7 @@ public class ApiController {
     }
 
     @GetMapping("/{id}/status")
-    public MonitorStatus getStatus(@PathVariable UUID id){
+    public MonitorStatusResponse getStatus(@PathVariable UUID id){
         return apiService.findById(id);
     }
 

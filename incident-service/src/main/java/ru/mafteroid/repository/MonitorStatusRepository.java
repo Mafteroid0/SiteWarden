@@ -6,5 +6,4 @@ import ru.mafteroid.entity.MonitorStatus;
 import java.util.UUID;
 
 public interface MonitorStatusRepository extends JpaRepository<MonitorStatus, UUID> {
-    MonitorStatus findMonitorStatusBy(UUID monitorId);
 }
