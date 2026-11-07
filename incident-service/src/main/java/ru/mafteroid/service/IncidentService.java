@@ -28,60 +28,49 @@ public class IncidentService {
 
     @Transactional
     public void process(CheckCompletedEvent event) {
-        CheckResult checkResult = new CheckResult(event);
-        checkResultRepository.save(checkResult);
-        updateStatus(checkResult);
-
-
-
-    }
-
-    @Transactional
-    public void updateStatus(CheckResult checkResult) {
-
-        MonitorStatus monitorStatus = monitorStatusRepository.findById(checkResult.getMonitorId()).
-                orElse(null);
-
-        String newStatus = checkResult.getSuccessful() ? "UP" : "DOWN";
-
-        if (monitorStatus == null) {
-            monitorStatus = new MonitorStatus(checkResult.getMonitorId());
-            monitorStatus.setStatus(newStatus);
-        }
-        if (!newStatus.equals(monitorStatus.getStatus())) {
-            changeIncident(monitorStatus.getId());
-            monitorStatus.setStatus(newStatus);
-        }
-        else {
+        if (checkResultRepository.existsById(event.checkId())) {
             return;
         }
 
-        monitorStatus.setLastCheckedAt(OffsetDateTime.now());
-        monitorStatusRepository.save(monitorStatus);
+        CheckResult result = new CheckResult(event);
+        checkResultRepository.save(result);
+        updateStatus(result);
     }
 
+    private void updateStatus(CheckResult result) {
+        UUID monitorId = result.getMonitorId();
+        OffsetDateTime checkedAt = result.getCompletedAt();
+        String newStatus = result.getSuccessful() ? "UP" : "DOWN";
 
-    @Transactional
-    public void changeIncident(UUID monitorId) {
+        MonitorStatus status = monitorStatusRepository.findById(monitorId)
+                .orElseGet(() -> new MonitorStatus(monitorId));
 
-        Incident incident = incidentRepository.findByMonitorIdAndResolvedAtIsNull(monitorId)
-                .orElse(null);
-        if (incident == null ) {
-            createIncident(monitorId);
-        }else{
-            incident.setResolvedAt(OffsetDateTime.now());
-            incidentRepository.save(incident);
+        if (status.getLastCheckedAt() != null
+                && checkedAt.isBefore(status.getLastCheckedAt())) {
+            return;
         }
 
+        if (!newStatus.equals(status.getStatus())) {
+            updateIncident(monitorId, newStatus, checkedAt);
+        }
 
-
-
+        status.setStatus(newStatus);
+        status.setLastCheckedAt(checkedAt);
+        monitorStatusRepository.save(status);
     }
 
-    @Transactional
-    protected void createIncident(UUID monitorId) {
-        Incident incident = new Incident(monitorId, OffsetDateTime.now());
-        incidentRepository.save(incident);
+    private void updateIncident(
+            UUID monitorId,
+            String newStatus,
+            OffsetDateTime checkedAt
+    ) {
+        var openIncident =
+                incidentRepository.findByMonitorIdAndResolvedAtIsNull(monitorId);
 
+        if ("DOWN".equals(newStatus) && openIncident.isEmpty()) {
+            incidentRepository.save(new Incident(monitorId, checkedAt));
+        } else if ("UP".equals(newStatus)) {
+            openIncident.ifPresent(incident -> incident.setResolvedAt(checkedAt));
+        }
     }
 }
