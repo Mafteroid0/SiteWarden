@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import ru.mafteroid.service.MonitorSchedulingService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -15,6 +17,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.mafteroid.entity.Monitor;
 import ru.mafteroid.repository.MonitorRepository;
+import ru.mafteroid.events.CheckType;
 import ru.mafteroid.web.dto.CreateMonitorRequest;
 
 import java.util.UUID;
@@ -27,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Testcontainers
 class MonitorCrudIntegrationTest {
+
+    @MockitoBean
+    MonitorSchedulingService scheduling;
 
     @Container
     @ServiceConnection
@@ -53,7 +59,7 @@ class MonitorCrudIntegrationTest {
                 "Google",
                 "https://google.com",
                 60,
-                5000
+                5000, CheckType.HTTP
         );
 
         MvcResult result = mockMvc.perform(
@@ -71,6 +77,7 @@ class MonitorCrudIntegrationTest {
 
         Monitor saved = monitorRepository.findById(id).orElseThrow();
 
+        assertEquals(CheckType.HTTP, saved.getCheckType());
         assertEquals(request.name(), saved.getName());
         assertEquals(request.url(), saved.getUrl());
         assertEquals(request.intervalSeconds(), saved.getIntervalSeconds());
@@ -111,7 +118,7 @@ class MonitorCrudIntegrationTest {
                 "",
                 "https://google.com",
                 60,
-                5000
+                5000, CheckType.HTTP
         );
 
         mockMvc.perform(
@@ -130,7 +137,7 @@ class MonitorCrudIntegrationTest {
                 "Google",
                 "https://google.com",
                 45,
-                5000
+                5000, CheckType.HTTP
         );
 
         mockMvc.perform(
@@ -193,7 +200,7 @@ class MonitorCrudIntegrationTest {
                 "Google",
                 "https://google.com",
                 60,
-                5000
+                5000, CheckType.HTTP
         );
 
         MvcResult result = mockMvc.perform(

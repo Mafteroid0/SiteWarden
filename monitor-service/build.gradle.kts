@@ -10,6 +10,8 @@ java {
     }
 }
 
+extra["testcontainers.version"] = "1.21.4"
+
 dependencies {
     implementation(project(":common-events"))
     implementation("org.springframework.boot:spring-boot-starter-web")

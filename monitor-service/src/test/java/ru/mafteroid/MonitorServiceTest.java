@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mafteroid.entity.Monitor;
 import ru.mafteroid.exception.InvalidMonitorConfigurationException;
 import ru.mafteroid.repository.MonitorRepository;
+import ru.mafteroid.events.CheckType;
 import ru.mafteroid.web.dto.CreateMonitorRequest;
 import ru.mafteroid.web.dto.MonitorResponse;
 import ru.mafteroid.service.MonitorService;
@@ -29,7 +30,7 @@ public class MonitorServiceTest {
                 "name",
                 "http://example.com",
                 30,
-                1000
+                1000, CheckType.HTTP
         );
 
         Mockito.when(monitorRepository.save(Mockito.any(Monitor.class)))
@@ -55,7 +56,7 @@ public class MonitorServiceTest {
                 "Main site",
                 "https://example.com",
                 45,
-                5000
+                5000, CheckType.HTTP
         );
 
         assertThrows(InvalidMonitorConfigurationException.class, () -> {
@@ -74,25 +75,25 @@ public class MonitorServiceTest {
                 name,
                 "ftp://example.com",
                 interval,
-                timeout
+                timeout, CheckType.HTTP
         );
         CreateMonitorRequest emptyHost = new CreateMonitorRequest(
                 name,
                 "https://",
                 interval,
-                timeout
+                timeout, CheckType.HTTP
         );
         CreateMonitorRequest containsCredentials = new CreateMonitorRequest(
                 name,
                 "https://user:password@example:8080/data",
                 interval,
-                timeout
+                timeout, CheckType.HTTP
         );
         CreateMonitorRequest invalidUrl = new CreateMonitorRequest(
                 name,
                 "THERE_IS_NO_URL",
                 interval,
-                timeout
+                timeout, CheckType.HTTP
         );
 
 
@@ -119,21 +120,21 @@ public class MonitorServiceTest {
                 "name",
                 "https://example.com",
                 30,
-                30 * 1000
+                30 * 1000, CheckType.HTTP
         );
 
         CreateMonitorRequest more = new CreateMonitorRequest(
                 "name",
                 "https://example.com",
                 30,
-                50 * 1000
+                50 * 1000, CheckType.HTTP
         );
 
         CreateMonitorRequest less = new CreateMonitorRequest(
                 "name",
                 "https://example.com",
                 30,
-                20 * 1000
+                20 * 1000, CheckType.HTTP
         );
 
 
@@ -154,4 +155,11 @@ public class MonitorServiceTest {
     }
 
 
+
+    @Test
+    void rejectsUnsupportedCheckType() {
+        var request = new CreateMonitorRequest("Example", "https://example.com", 30, 1000, CheckType.TCP);
+        assertThrows(InvalidMonitorConfigurationException.class, () -> monitorService.createMonitor(request));
+        verifyNoInteractions(monitorRepository);
+    }
 }
