@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f6ef">
+  <title>SiteWarden</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="shell masthead">
+    <h1><a class="brand" href="./">SiteWarden</a></h1>
+    <div class="sync-tools"><small id="sync" role="status"></small><button id="refresh">Обновить</button></div>
+  </header>
+  <main class="shell">
+    <section aria-labelledby="list-title">
+      <div class="toolbar">
+        <h2 id="list-title">Мониторы <span class="count" id="total">—</span></h2>
+        <button class="primary" id="add"><span aria-hidden="true">+</span> Добавить монитор</button>
+      </div>
+      <p class="notice" id="list-error" role="status" hidden></p>
+      <div class="scroll" id="list"><p class="empty">Загружаем мониторы…</p></div>
+    </section>
+
+    <section class="details" id="details" aria-labelledby="detail-name" hidden>
+      <div class="toolbar">
+        <h2 id="detail-name" tabindex="-1"></h2>
+        <button id="close-detail" aria-label="Закрыть сведения о мониторе">Закрыть</button>
+      </div>
+      <div class="detail-body">
+        <p class="address" id="detail-url"></p>
+        <dl id="facts"></dl>
+        <div class="actions"><button id="toggle"></button><button class="danger" id="delete">Удалить</button></div>
+        <p class="notice" id="detail-error" role="status" hidden></p>
+      </div>
+      <div class="history-bar">
+        <div class="switch" role="group" aria-label="Вид истории">
+          <button id="checks" aria-pressed="true">Проверки</button><button id="incidents" aria-pressed="false">Инциденты</button>
+        </div>
+        <label class="limit">Записей <select id="limit"><option>10</option><option>20</option><option>50</option><option>100</option></select></label>
+      </div>
+      <div class="scroll" id="history"></div>
+    </section>
+
+    <dialog id="new-monitor" aria-labelledby="form-title"><form id="create">
+      <h2 id="form-title">Новый монитор</h2>
+      <label>Название<input name="name" required maxlength="100" placeholder="Основной сайт"></label>
+      <label>Адрес<input name="url" type="url" required maxlength="2048" placeholder="https://example.com"></label>
+      <div class="form-pair">
+        <label>Интервал<select name="intervalSeconds"><option value="30">30 секунд</option><option value="60">1 минута</option><option value="300">5 минут</option></select></label>
+        <label>Таймаут, мс<input name="timeoutMs" type="number" min="1000" max="10000" value="5000" required></label>
+      </div>
+      <p class="notice" id="form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" id="cancel-create">Отмена</button><button class="primary">Создать</button></div>
+    </form></dialog>
+
+    <dialog id="confirm-delete" aria-labelledby="delete-title">
+      <h2 id="delete-title">Удалить монитор?</h2><p id="delete-message"></p>
+      <p class="notice" id="delete-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button id="cancel-delete" autofocus>Отмена</button><button class="danger" id="confirm">Удалить монитор</button></div>
+    </dialog>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
